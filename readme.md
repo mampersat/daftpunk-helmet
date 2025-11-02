@@ -1,7 +1,9 @@
-Daft Punk Helmet Lights
+# Daft Punk Helmet Lights
 
+## First light
 ![Daft Punk Helmet LED visor demo](helmet.gif)
 
+## Debugging output
 ```text
 · · · · · ● ● · · · ● · · ● ● ● · ● ● ● · · ● ● · · ● · ● · ● ● · · ● · ● · · ·
 · · · · · ● · ● · ● · ● · ● · · · · ● · · · ● · ● · ● · ● · ● · ● · ● · ● · · ·
@@ -13,7 +15,10 @@ Daft Punk Helmet Lights
 [Pico microcontroller](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html)
 
 # BOM
-[Helmet purchased from MazPowerProps](https://www.etsy.com/shop/MazPowerProps?ref=yr_purchases)
+* [Helmet purchased from MazPowerProps](https://www.etsy.com/shop/MazPowerProps?ref=yr_purchases)
+* [Raspberry PI Pico](https://www.raspberrypi.com/products/raspberry-pi-pico/)
+
+
 # Inspo
 
 http://www.gperco.com/2013/11/daft-punk-helmets-controllers-and-code.html
