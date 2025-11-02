@@ -1,9 +1,15 @@
+# main.py
+import fivefont as ff
+
+ROWS = 5
+COLS = 40
+
 # Portable setup: Pico on-device vs desktop mock
 try:
     import machine, neopixel, time, random
     IS_PICO = True
     PIN_NUM = 28
-    N_PIX   = 119           # e.g., 7 rows * 17 cols
+    N_PIX   = ROWS * COLS           # e.g., 7 rows * 17 cols
     np = neopixel.NeoPixel(machine.Pin(PIN_NUM), N_PIX)
 except ImportError:
     import time, random
@@ -35,7 +41,9 @@ except ImportError:
         def write(self):
             """Render pixels as colored ASCII circles in a grid."""
 
-            print("\033[2J\033[H", end="")
+            # print("\033[2J\033[H", end="")
+            print("\033c", end="")
+
 
             if self.width is None or self.width <= 0:
                 # Linear render
@@ -44,6 +52,7 @@ except ImportError:
                     if (r, g, b) == (0, 0, 0):
                         line.append(self._off)
                     else:
+                        # 
                         line.append(self._ansi_rgb(r, g, b) + self._dot + self._reset())
                 print("".join(line))
                 return
@@ -74,23 +83,21 @@ except ImportError:
 
     # Configure your mock for a 7x17 visor (serpentine wiring default)
     PIN_NUM = 28
-    N_PIX   = 119
-    np = MockNeoPixel(MockPin(PIN_NUM), N_PIX, width=17, serpentine=True)
+    N_PIX   = ROWS * COLS
+    np = MockNeoPixel(MockPin(PIN_NUM), N_PIX, width=COLS, serpentine=True)
 
 if __name__ == "__main__":
-    # Example: random sparkle then gradient
-    for i in range(np.n):
-        np[i] = (random.randint(0, 40), random.randint(0, 40), random.randint(0, 40))
-    np.write()
-    time.sleep(0.5)
     print("Running on Pico" if IS_PICO else "Running on desktop (mock)")
 
+    ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(255,0,0), spacing=1,
+               speed_cols=1, delay_ms=500, serpentine=True)
 
+    time.sleep(5)
     while True:
 
         for i in range(N_PIX):
             if (random.randint(1,3) == 1):
-                np[i] = (random.randint(0,20), random.randint(0,20), random.randint(0,20))
+                np[i] = (random.randint(0,10), random.randint(0,10), random.randint(0,10))
             else:
                 np[i] = (0, 0, 0)
                 
