@@ -1,6 +1,6 @@
 Daft Punk Helmet Lights
 
-<video src="first_light.mp4" autoplay loop muted playsinline></video>
+![Daft Punk Helmet LED visor demo](helmet.gif)
 
 ```text
 · · · · · ● ● · · · ● · · ● ● ● · ● ● ● · · ● ● · · ● · ● · ● ● · · ● · ● · · ·
