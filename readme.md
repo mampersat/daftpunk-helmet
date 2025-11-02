@@ -1,10 +1,12 @@
 Daft Punk Helmet Lights
 
+```text
 · · · · · ● ● · · · ● · · ● ● ● · ● ● ● · · ● ● · · ● · ● · ● ● · · ● · ● · · ·
 · · · · · ● · ● · ● · ● · ● · · · · ● · · · ● · ● · ● · ● · ● · ● · ● · ● · · ·
 · · · · · ● · ● · ● ● ● · ● ● · · · ● · · · ● ● · · ● · ● · ● · ● · ● ● · · · ·
 · · · · · ● · ● · ● · ● · ● · · · · ● · · · ● · · · ● · ● · ● · ● · ● · ● · · ·
 · · · · · ● ● · · ● · ● · ● · · · · ● · · · ● · · · ● ● ● · ● · ● · ● · ● · · ·
+```
 
 [Pico microcontroller](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html)
 
