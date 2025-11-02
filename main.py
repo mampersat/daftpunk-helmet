@@ -2,7 +2,8 @@
 import fivefont as ff
 
 ROWS = 5
-COLS = 40
+COLS = 21
+# ROW_LENGTHS = (21, 21, 21, , 35)  # top to bottom, adjust to your actual counts
 
 # Portable setup: Pico on-device vs desktop mock
 try:
@@ -89,10 +90,20 @@ except ImportError:
 if __name__ == "__main__":
     print("Running on Pico" if IS_PICO else "Running on desktop (mock)")
 
-    ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(255,0,0), spacing=1,
-               speed_cols=1, delay_ms=500, serpentine=True)
+    ff.draw_text_window(np, COLS, ROWS, "   HELLO", window_x=0, color=(255,180,40), spacing=1, serpentine=True)
+    np.write()
+    time.sleep(2)
 
-    time.sleep(5)
+    while True:
+        ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(100,0,0), spacing=1,
+               speed_cols=1, delay_ms=50, serpentine=True)
+
+        ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(0,100,0), spacing=1,
+               speed_cols=1, delay_ms=50, serpentine=True)
+               
+        ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(0,0,100), spacing=1,
+               speed_cols=1, delay_ms=50, serpentine=True)
+
     while True:
 
         for i in range(N_PIX):
