@@ -1,5 +1,8 @@
 # Daft Punk Helmet Lights
 
+## It's alive
+![It's alive](itsalive.gif)
+
 ## First light
 ![Daft Punk Helmet LED visor demo](helmet.gif)
 

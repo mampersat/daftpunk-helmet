@@ -90,11 +90,23 @@ except ImportError:
 if __name__ == "__main__":
     print("Running on Pico" if IS_PICO else "Running on desktop (mock)")
 
-    ff.draw_text_window(np, COLS, ROWS, "   HELLO", window_x=0, color=(255,180,40), spacing=1, serpentine=True)
+    ff.draw_text_window(np, COLS, ROWS, " HELLO", window_x=0, color=(155,80,40), spacing=1, serpentine=True)
+    np.write()
+    time.sleep(2)
+
+    ff.draw_text_window(np, COLS, ROWS, "HARDWR", window_x=0, color=(155,80,40), spacing=1, serpentine=True)
+    np.write()
+    time.sleep(2)
+
+    ff.draw_text_window(np, COLS, ROWS, "BETTER", window_x=0, color=(155,80,40), spacing=1, serpentine=True)
     np.write()
     time.sleep(2)
 
     while True:
+
+        ff.scroll_text(np, COLS, ROWS, "HARDER   BETTER   FASTER   STRONGER    OUR WORK IS     NEVER     OVER     NEVER OVER NEVER OVER NEVER OVER", color=(0,0,100), spacing=1,
+              speed_cols=1, delay_ms=10, serpentine=True)
+
         ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(100,0,0), spacing=1,
                speed_cols=1, delay_ms=50, serpentine=True)
 
@@ -103,6 +115,9 @@ if __name__ == "__main__":
                
         ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(0,0,100), spacing=1,
                speed_cols=1, delay_ms=50, serpentine=True)
+
+
+
 
     while True:
 
