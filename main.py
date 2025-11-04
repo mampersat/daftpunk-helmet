@@ -87,22 +87,25 @@ except ImportError:
     N_PIX   = ROWS * COLS
     np = MockNeoPixel(MockPin(PIN_NUM), N_PIX, width=COLS, serpentine=True)
 
-if __name__ == "__main__":
+def main_loop():
     print("Running on Pico" if IS_PICO else "Running on desktop (mock)")
 
-    ff.draw_text_window(np, COLS, ROWS, " HELLO", window_x=0, color=(155,80,40), spacing=1, serpentine=True)
-    np.write()
-    time.sleep(2)
-
-    ff.draw_text_window(np, COLS, ROWS, "HARDWR", window_x=0, color=(155,80,40), spacing=1, serpentine=True)
-    np.write()
-    time.sleep(2)
-
-    ff.draw_text_window(np, COLS, ROWS, "BETTER", window_x=0, color=(155,80,40), spacing=1, serpentine=True)
-    np.write()
-    time.sleep(2)
+    chorus = ("WORK", "1T", "HARD", "ER",
+        "MAKE", "IT", "BETT", "ER",
+        "DO", "IT", "FAST", "ER",
+        "MAKE", "US", "STRONG", "ER",
+        "MORE THAN", "EVER", "HOUR AFTER"
+        "OUR", "WORK IS",
+        "NEVER", "OVER",
+        "OVER", "OV3E", "OVER", "0V3R")
 
     while True:
+        for word in chorus:
+            ff.draw_text(np, COLS, ROWS, word, color=(155,80,40), spacing=1, serpentine=True)
+            np.write()
+            time.sleep(1.952 / 4)
+            np.fill((0,0,0))
+            np.write()
 
         ff.scroll_text(np, COLS, ROWS, "HARDER   BETTER   FASTER   STRONGER    OUR WORK IS     NEVER     OVER     NEVER OVER NEVER OVER NEVER OVER", color=(0,0,100), spacing=1,
               speed_cols=1, delay_ms=10, serpentine=True)
@@ -141,3 +144,7 @@ def pixel_to_xy(p):
             return (row, p - a)
         a += count
 
+
+if __name__ == "__main__":
+    main_loop()
+    

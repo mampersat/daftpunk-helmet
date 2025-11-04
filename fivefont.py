@@ -33,6 +33,7 @@ FONT_3x5 = {
     "G": (0b01110,0b10001,0b11101),
     "H": (0b11111,0b00100,0b11111),
     "I": (0b10001,0b11111,0b10001),
+    # "I": (0b11111),
     "J": (0b10001,0b11110,0b00000),
     "K": (0b11111,0b00100,0b11011),
     "L": (0b11111,0b10000,0b10000),
@@ -82,14 +83,28 @@ def draw_char(np, width, height, x0, ch, color=(255,255,255), spacing=1, serpent
     # spacing column left blank
     return gw + spacing
 
-def draw_text(np, width, height, text, x_start=0, color=(255,255,255), spacing=1, serpentine=True):
-    """Draw text starting at x_start (can be negative for scrolling in). Returns total pixel width."""
-    x = x_start
-    total = 0
+def draw_text(np, width, height, text, x_start=None, color=(255,255,255), spacing=1, serpentine=True):
+    """
+    Draw text horizontally centered (if x_start=None) or starting at x_start.
+    Returns total pixel width of the rendered text.
+    """
+    # measure text width first
+    text_width = 0
     for ch in text:
-        total += draw_char(np, width, height, x, ch, color=color, spacing=spacing, serpentine=serpentine)
-        x += total - (x - x_start)  # move by last drawn width
-    return total
+        glyph = FONT_3x5.get(ch.upper(), ())
+        text_width += len(glyph) + spacing
+    if text_width > 0:
+        text_width -= spacing  # remove trailing space
+
+    # if no explicit start, center horizontally
+    if x_start is None:
+        x_start = (width - text_width) // 2
+
+    # now draw
+    x = x_start
+    for ch in text:
+        x += draw_char(np, width, height, x, ch, color=color, spacing=spacing, serpentine=serpentine)
+    return text_width
 
 def draw_text_window(np, width, height, text, window_x, color=(255,255,255), spacing=1, serpentine=True):
     """
