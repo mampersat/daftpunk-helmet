@@ -95,20 +95,37 @@ def main_loop():
     print("Running on Pico" if IS_PICO else "Running on desktop (mock)")
 
 
-    if IS_PICO:
-        import ntp
-
     ff.draw_text(np, COLS, ROWS, "HELLO", color=(55, 55, 55), spacing=1, serpentine=True)
     np.write()
+
+    side_burns()
+
+    if IS_PICO:
+        import ntp
+        
 
     # Clock
     while True:
         t = time.localtime()  # keep as struct_time, not string
-        s = "%d:%02d" % ((t[3] -5 ) % 12, t[4])  # hour (12-hour) and minute
-        color = int(int(t[4]) / 60.0 * 255)
-        color = 100
+
+        hour = t[3]
+
+        if IS_PICO:
+            hour -= 5
+
+        s = "%d:%02d" % (hour % 12, t[4])  # hour (12-hour) and minute
+
+        # Red at the top of every 0m/30m, blue at 15m/45m, green at 30m/60m
+        if (t[4] % 30) < 10:
+            color = (0, 100, 0)
+        elif (t[4] % 30) < 20:
+            color = (0, 0, 100)
+        else:
+            color = (100, 0, 0)
+
         np.fill((0, 0, 0))        
-        ff.draw_text(np, COLS, ROWS, s, color=(color, color, color), spacing=0, serpentine=True)
+        side_burns()
+        ff.draw_text(np, COLS, ROWS, s, color = color, spacing=1, serpentine=True, x_start=3)
         np.write()
         time.sleep(0.5)
 
@@ -194,6 +211,16 @@ def main_loop():
         np.write()
         time.sleep(1)
 
+def side_burns():
+    # side burns
+    for x in [0, 1, 2, COLS - 3, COLS - 2, COLS - 1]:
+        np[xy_to_pixel(x, 0)] = (20, 0, 0)
+        np[xy_to_pixel(x, 1)] = (10, 10, 0)
+        np[xy_to_pixel(x, 2)] = (0, 20, 0)
+        np[xy_to_pixel(x, 3)] = (0, 0, 20)
+        np[xy_to_pixel(x, 4)] = (0, 0, 20)
+        # np.write()
+
 # Map pixel number to x,y
 # The pixels are in a serpintine layout with COLS columns and ROWS rows
 def pixel_to_xy(p):
@@ -202,6 +229,12 @@ def pixel_to_xy(p):
     if row % 2 == 1:
         col = COLS - 1 - col
     return (col, row)
+
+# Map x,y to pixel number
+def xy_to_pixel(x, y):
+    if y % 2 == 1:
+        x = COLS - 1 - x
+    return y * COLS + x
 
 
 if __name__ == "__main__":
