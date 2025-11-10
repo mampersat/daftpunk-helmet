@@ -117,7 +117,10 @@ def main_loop():
         if hour == 0:
             hour = 12
 
-        s = "%d:%02d" % (hour, t[4])  # hour (12-hour) and minute
+        if t[5] % 2 == 0:
+            s = "%d:%02d" % (hour, t[4])
+        else:
+            s = "%d.%02d" % (hour, t[4])
 
         # Red at the top of every 0m/30m, blue at 15m/45m, green at 30m/60m
         if (t[4] % 30) < 10:
