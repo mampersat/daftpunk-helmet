@@ -1,5 +1,8 @@
 # main.py
 import fivefont as ff
+import starfield
+import time
+import math
 
 ROWS = 5
 COLS = 21
@@ -12,6 +15,7 @@ try:
     PIN_NUM = 28
     N_PIX   = ROWS * COLS           # e.g., 7 rows * 17 cols
     np = neopixel.NeoPixel(machine.Pin(PIN_NUM), N_PIX)
+
 except ImportError:
     import time, random
     IS_PICO = False
@@ -90,6 +94,61 @@ except ImportError:
 def main_loop():
     print("Running on Pico" if IS_PICO else "Running on desktop (mock)")
 
+
+    if IS_PICO:
+        import ntp
+
+    ff.draw_text(np, COLS, ROWS, "HELLO", color=(55, 55, 55), spacing=1, serpentine=True)
+    np.write()
+
+    # Clock
+    while True:
+        t = time.localtime()  # keep as struct_time, not string
+        s = "%d:%02d" % ((t[3] -5 ) % 12, t[4])  # hour (12-hour) and minute
+        color = int(int(t[4]) / 60.0 * 255)
+        color = 100
+        np.fill((0, 0, 0))        
+        ff.draw_text(np, COLS, ROWS, s, color=(color, color, color), spacing=0, serpentine=True)
+        np.write()
+        time.sleep(0.5)
+
+
+    while True:
+        t = time.time()
+        
+        for i in range(N_PIX):
+            x, y = pixel_to_xy(i)
+            # val = int((math.sin(t) + 1) / 2 * 255)
+            val = (x + int(t)) % 5
+            np[i] = (val, val, val)
+            # print(val)
+
+        np.write()
+        time.sleep(0.1)
+        print(val)
+
+
+    while True:
+        # Simple rainbow wipe
+        for i in range(N_PIX):
+            x, y = pixel_to_xy(i)
+            r = (x * 5) % 256
+            g = (y * 3) % 256
+            b = (x * 7) % 256
+            np[i] = (r, g, b)
+            np.write()
+            time.sleep(0.01)
+            
+    while True:
+        # Starfield effect
+        for t in range(0, 1000, 5):
+            for p in range(N_PIX):
+                x, y = pixel_to_xy(p)
+                r, g, b = starfield.starfield_pixel(x * (200 // COLS), y * (200 // ROWS), t / 10.0)
+                np[p] = (r, g, b)
+            np.write()
+            time.sleep(0.05)
+            
     chorus = ("WORK", "1T", "HARD", "ER",
         "MAKE", "IT", "BETT", "ER",
         "DO", "IT", "FAST", "ER",
@@ -100,6 +159,7 @@ def main_loop():
         "OVER", "OV3E", "OVER", "0V3R")
 
     while True:
+
         for word in chorus:
             ff.draw_text(np, COLS, ROWS, word, color=(155,80,40), spacing=1, serpentine=True)
             np.write()
@@ -108,7 +168,7 @@ def main_loop():
             np.write()
 
         ff.scroll_text(np, COLS, ROWS, "HARDER   BETTER   FASTER   STRONGER    OUR WORK IS     NEVER     OVER     NEVER OVER NEVER OVER NEVER OVER", color=(0,0,100), spacing=1,
-              speed_cols=1, delay_ms=10, serpentine=True)
+              speed_cols=1, delay_ms=3, serpentine=True)
 
         ff.scroll_text(np, COLS, ROWS, "                      DAFT PUNK", color=(100,0,0), spacing=1,
                speed_cols=1, delay_ms=50, serpentine=True)
@@ -134,15 +194,14 @@ def main_loop():
         np.write()
         time.sleep(1)
 
-# Map pixxel number to x,y
+# Map pixel number to x,y
+# The pixels are in a serpintine layout with COLS columns and ROWS rows
 def pixel_to_xy(p):
-    # pixels in each row
-    counts = (20, 20, 20, 20, 20)
-    a = 0
-    for row, count in enumerate(counts):
-        if p < a + count:
-            return (row, p - a)
-        a += count
+    row = p // COLS
+    col = p % COLS
+    if row % 2 == 1:
+        col = COLS - 1 - col
+    return (col, row)
 
 
 if __name__ == "__main__":
