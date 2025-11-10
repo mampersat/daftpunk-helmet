@@ -33,8 +33,13 @@ except ImportError:
 
         # ANSI truecolor helpers
         @staticmethod
-        def _ansi_rgb(r, g, b):
-            return f"\x1b[38;2;{r};{g};{b}m"  # foreground
+        def _ansi_rgb(r, g, b, gamma=0.1):
+            # gamma < 1 brightens; gamma > 1 darkens
+            def boost(x):
+                return int(255 * ((x / 255.0) ** gamma))
+            r, g, b = boost(r), boost(g), boost(b)
+            return f"\x1b[38;2;{r};{g};{b}m"
+
         @staticmethod
         def _reset():
             return "\x1b[0m"
@@ -132,9 +137,9 @@ def main_loop():
 
         np.fill((0, 0, 0))        
         side_burns()
-        ff.draw_text(np, COLS, ROWS, s, color = color, spacing=1, serpentine=True, x_start=3)
+        ff.draw_text(np, COLS, ROWS, s, color = color, spacing=1, serpentine=True)
         np.write()
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 
     while True:
