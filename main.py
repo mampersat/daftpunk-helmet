@@ -113,7 +113,11 @@ def main_loop():
         if IS_PICO:
             hour -= 5
 
-        s = "%d:%02d" % (hour % 12, t[4])  # hour (12-hour) and minute
+        hour = hour % 12
+        if hour == 0:
+            hour = 12
+
+        s = "%d:%02d" % (hour, t[4])  # hour (12-hour) and minute
 
         # Red at the top of every 0m/30m, blue at 15m/45m, green at 30m/60m
         if (t[4] % 30) < 10:
