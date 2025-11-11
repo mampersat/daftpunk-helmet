@@ -22,7 +22,9 @@
 * [Raspberry PI Pico](https://www.raspberrypi.com/products/raspberry-pi-pico/)
 
 
-# Inspo
+# Inspo / Notes
+
+[Reddit post with evolution of Thomas Helmet](https://www.reddit.com/r/DaftPunk/comments/m9nyvf/the_evolution_of_thomas_bangalters_helmet/)
 
 http://www.gperco.com/2013/11/daft-punk-helmets-controllers-and-code.html
 
