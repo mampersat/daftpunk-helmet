@@ -90,6 +90,7 @@ def serve_once(sock, state):
             # apply params
             if "mode" in params:
                 state["mode"] = params["mode"]
+                print("Set mode to", state["mode"])
             if "brightness" in params:
                 if params["brightness"] == "up":
                     state["brightness"] = min(1.0, state["brightness"] + 0.1)

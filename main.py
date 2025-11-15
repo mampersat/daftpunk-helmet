@@ -1,6 +1,7 @@
 # main.py — tiny glue: Wi-Fi + web + a placeholder animation loop
 import time
 import machine, neopixel
+from modes import textmode
 
 import webcontrol
 
@@ -30,9 +31,8 @@ def demo_frame(t):
         v = int(255 * b * (0.5 + 0.5*( (t*2) % 1 )))
         fill_color((0, v, 0))
     elif state["mode"] == "text":
-        # cyan
-        v = int(255 * b)
-        fill_color((0, v, v))
+        textmode.step(np, state, t)
+        print("Text mode step at time", t)
     else:  # wave
         v = int(255 * b)
         fill_color((v, 0, v))
@@ -54,6 +54,8 @@ def main():
         demo_frame(t)
 
         # 3) small delay (~30 FPS)
+        # print a . with no newline to show we're alive
+        print(".", end="")
         time.sleep_ms(30)
 
 if __name__ == "__main__":
