@@ -218,6 +218,7 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
     <button name="mode" value="wave">Wave</button>
     <button name="mode" value="clock">Clock</button>
     <button name="mode" value="tron">Tron</button>
+    <button name="mode" value="rain">Rain</button>
     <div>
         <input name="text" value="{text}">
         <button name="mode" value="text">Text</button>

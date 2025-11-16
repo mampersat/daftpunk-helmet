@@ -1,7 +1,7 @@
 # main.py — tiny glue: Wi-Fi + web + a placeholder animation loop
 import time
 import machine, neopixel
-from modes import textmode, clock, tron
+from modes import textmode, clock, tron, rain
 
 import webcontrol
 
@@ -37,6 +37,8 @@ def demo_frame(t):
         clock.step(np, state, t)
     elif state["mode"] == "tron":
         tron.step(np, state, t)
+    elif state["mode"] == "rain":
+        rain.step(np, state, t)
     else:  # wave
         v = int(255 * b)
         fill_color((v, 0, v))
@@ -60,7 +62,7 @@ def main():
         # 3) small delay (~30 FPS)
         # print a . with no newline to show we're alive
         print(".", end="")
-        time.sleep_ms(30)
+        time.sleep_ms(10)
 
 if __name__ == "__main__":
     main()
