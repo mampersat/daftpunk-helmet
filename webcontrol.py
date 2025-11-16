@@ -83,21 +83,24 @@ def serve_once(sock, state):
         req = cl.recv(1024)
         if not req:
             return
+
         first = req.split(b"\r\n", 1)[0].decode("utf-8", "ignore")
         path, params = _parse_path_qs(first)
+        print(f"{first=}")
 
         if path.startswith("/set"):
+            
+            print(f"HTTP:{path=}, {params=}", path, params, "before mode:", state["mode"])
+
             # apply params
             if "mode" in params:
                 state["mode"] = params["mode"]
                 print("Set mode to", state["mode"])
-            if "brightness" in params:
-                if params["brightness"] == "up":
-                    state["brightness"] = min(1.0, state["brightness"] + 0.1)
-                elif params["brightness"] == "down":
-                    state["brightness"] = max(0.05, state["brightness"] - 0.1)
+
             if "text" in params and params["text"]:
                 state["text"] = params["text"]
+                state["mode"] = "text"
+                print("Set text and mode")
 
             # proper redirect back to root
             cl.send(
@@ -116,26 +119,44 @@ def serve_once(sock, state):
 body {{font-family:sans-serif;background:#111;color:#eee;text-align:center}}
 button {{font-size:1.1rem;margin:.25rem;padding:.4rem .8rem}}
 input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
+/* styled anchor that looks like the buttons above */
+.btn {{
+    display:inline-block;
+    text-decoration:none;
+    color:inherit;
+    background:#222;
+    border:1px solid #444;
+    padding:.4rem .8rem;
+    margin:.25rem;
+    font-size:1.1rem;
+    border-radius:4px;
+}}
+.btn:hover {{ background:#333 }}
 </style></head>
 <body>
 <h1>Daft Punk Helmet</h1>
 <p>Mode: <b>{mode}</b> — Brightness: {b:.2f}</p>
 <form action="/set" method="get">
 <p>
-  <button name="mode" value="bars">Bars</button>
-  <button name="mode" value="text">Text</button>
-  <button name="mode" value="wave">Wave</button>
-  <button name="mode" value="clock">Clock</button>
-  <button name="mode" value="tron">Tron</button>
-  
-</p>
-
-<p>
-  <input name="text" value="{text}">
-</p>
-</form>
-</body></html>""".format(mode=state["mode"], b=state["brightness"], text=state["text"])
+    <button name="mode" value="bars">Bars</button>
     
+    <button name="mode" value="wave">Wave</button>
+    <button name="mode" value="clock">Clock</button>
+    <button name="mode" value="tron">Tron</button>
+    <div>
+        <input name="text" value="{text}">
+        <button name="mode" value="text">Text</button>
+    </div>
+
+ </p>
+</form>
+<p>
+    <a class="btn" href="/set?text=HELLO">Set text to HELLO</a>
+    <a class="btn" href="/set?text=HAPPY">Set text to HAPPY</a>
+</p>
+ 
+</body></html>""".format(mode=state["mode"], b=state["brightness"], text=state["text"])
+        
 
         _resp(cl, html)
     finally:

@@ -9,7 +9,7 @@ import webcontrol
 state = {
     "mode": "clock",
     "brightness": 0.4,
-    "text": "DAFT PUNK",
+    "text": "words",
 }
 
 # Hardware (adjust to your pins/layout)
