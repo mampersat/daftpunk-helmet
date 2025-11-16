@@ -1,8 +1,10 @@
 # main.py — tiny glue: Wi-Fi + web + a placeholder animation loop
 import time
-import machine, neopixel
-from modes import textmode, clock, tron, rain
+import machine
+import neopixel
+import os
 
+from modes import clock, grot, rain, text, tron
 import webcontrol
 
 # Runtime state (kept here to keep things minimal)
@@ -25,23 +27,16 @@ def fill_color(rgb):
     np.write()
 
 def demo_frame(t):
-    # super simple demo that changes color with mode/brightness
-    b = state["brightness"]
-    if state["mode"] == "bars":
-        # pulse green
-        v = int(255 * b * (0.5 + 0.5*( (t*2) % 1 )))
-        fill_color((0, v, 0))
-    elif state["mode"] == "text":
-        textmode.step(np, state, t)
-    elif state["mode"] == "clock":
-        clock.step(np, state, t)
-    elif state["mode"] == "tron":
-        tron.step(np, state, t)
-    elif state["mode"] == "rain":
-        rain.step(np, state, t)
-    else:  # wave
-        v = int(255 * b)
-        fill_color((v, 0, v))
+    mode_name = state["mode"]  # e.g. "clock"
+    print("Mode:", mode_name)
+    try:
+        mode_module = getattr(modes, mode_name)
+        mode_func = getattr(mode_module, "step")
+    except AttributeError:
+        # fallback
+        from modes import clock as mode_module
+        mode_func = mode_module.step
+    mode_func(np, state, t)
 
 def main():
     wlan = webcontrol.connect_wifi()   # ok if None
@@ -49,15 +44,31 @@ def main():
     if wlan:
         sock = webcontrol.create_server()
 
+    # discover the modes in the modes directory
+    files = os.listdir("modes")
+    available_modes = [f[:-3] for f in files if f.endswith(".py") and f != "__init__.py"]
+
+    modes_map = {}
+
+    for name in available_modes:
+        try:
+            # Import as: modes.clock  -> returns the submodule object
+            mod = __import__("modes." + name, None, None, (name,))
+            modes_map[name] = mod
+        except Exception as e:
+            print("Error importing mode", name, e)
+    print("Available modes:", available_modes)
+
+
     t0 = time.ticks_ms()
     while True:
         # 1) serve one HTTP request (if server exists)
         if sock:
-            webcontrol.serve_once(sock, state)
+            webcontrol.serve_once(sock, state, available_modes=available_modes)
 
         # 2) draw one frame
         t = (time.ticks_diff(time.ticks_ms(), t0) / 1000.0)
-        demo_frame(t)
+        modes_map[state["mode"]].step(np, state, t)
 
         # 3) small delay (~30 FPS)
         # print a . with no newline to show we're alive

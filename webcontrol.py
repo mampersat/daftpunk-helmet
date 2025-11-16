@@ -107,7 +107,7 @@ def _parse_color(s):
     return (vals[0], vals[1], vals[2])
 
 
-def serve_once(sock, state):
+def serve_once(sock, state, available_modes=None):
     """
     Handle at most one HTTP request. Keep it simple:
     - blocking accept up to 0.5s (socket timeout)
@@ -163,7 +163,11 @@ def serve_once(sock, state):
             return
 
         # root page
-        # build quick links from a list so it's easy to change/extend
+        # build buttons for modes
+        mode_buttons = " ".join(
+            '<a class="btn" href="/set?mode={0}">{0}</a>'.format(m)
+            for m in available_modes
+        )
 
         words = [
             "HELLO",
@@ -213,12 +217,7 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
 <p>Mode: <b>{mode}</b> — Brightness: {b:.2f}</p>
 <form action="/set" method="get">
 <p>
-    <button name="mode" value="bars">Bars</button>
-    
-    <button name="mode" value="wave">Wave</button>
-    <button name="mode" value="clock">Clock</button>
-    <button name="mode" value="tron">Tron</button>
-    <button name="mode" value="rain">Rain</button>
+    {mode_buttons}
     <div>
         <input name="text" value="{text}">
         <button name="mode" value="text">Text</button>
@@ -235,7 +234,11 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
     {quick_links}
 </p>
  
-</body></html>""".format(mode=state["mode"], b=state["brightness"], text=state["text"], quick_links=quick_links)
+</body></html>""".format(mode=state["mode"], 
+                         b=state["brightness"], 
+                         text=state["text"], 
+                         quick_links=quick_links, 
+                         mode_buttons=mode_buttons  )
         
 
         _resp(cl, html)
