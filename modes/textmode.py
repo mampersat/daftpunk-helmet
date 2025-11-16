@@ -4,8 +4,8 @@ import config
 
 def step(np, state, t):
     # render text in state["text"], with brightness
-    print("Text mode:", state.get("text", ""))
+    color = state["color"]
     np.fill((0,0,0))
-    ff.draw_text(np, config.COLS, config.ROWS, state["text"], color=(55, 55, 55), spacing=1, serpentine=True)
+    ff.draw_text(np, config.COLS, config.ROWS, state["text"],color=color, spacing=1, serpentine=True)
 
     np.write()

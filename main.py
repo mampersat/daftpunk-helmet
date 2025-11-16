@@ -10,6 +10,7 @@ state = {
     "mode": "clock",
     "brightness": 0.4,
     "text": "words",
+    "color": (150, 0, 0),
 }
 
 # Hardware (adjust to your pins/layout)

@@ -66,6 +66,47 @@ def _resp(cl, body, status="200 OK", ctype="text/html; charset=utf-8"):
         cl.send(body)
 
 
+def _parse_color(s):
+    """Parse a color string into an (r,g,b) tuple.
+
+    Accepts:
+      - hex: "#RRGGBB" or "RRGGBB"
+      - rgb function: "rgb(r,g,b)"
+      - comma-separated: "r,g,b"
+
+    Returns (r,g,b) with ints 0-255, or None on parse failure.
+    """
+    if not s:
+        return None
+    s = s.strip()
+    # hex form
+    if s.startswith('#'):
+        s2 = s[1:]
+        if len(s2) == 6:
+            try:
+                r = int(s2[0:2], 16)
+                g = int(s2[2:4], 16)
+                b = int(s2[4:6], 16)
+                return (r, g, b)
+            except Exception:
+                return None
+    # rgb(...) form
+    if s.lower().startswith('rgb(') and s.endswith(')'):
+        s = s[s.find('(')+1:-1]
+
+    # comma-separated numbers
+    parts = [p.strip() for p in s.split(',')]
+    if len(parts) != 3:
+        return None
+    try:
+        vals = [int(float(p)) for p in parts]
+    except Exception:
+        return None
+    # clamp to 0-255
+    vals = [max(0, min(255, v)) for v in vals]
+    return (vals[0], vals[1], vals[2])
+
+
 def serve_once(sock, state):
     """
     Handle at most one HTTP request. Keep it simple:
@@ -102,6 +143,15 @@ def serve_once(sock, state):
                 state["mode"] = "text"
                 print("Set text and mode")
 
+            # color param: accept RRGGBB (no #), #RRGGBB, rgb(...) or r,g,b
+            if "color" in params and params["color"]:
+                parsed = _parse_color(params["color"])
+                if parsed:
+                    state["color"] = parsed
+                    print("Set color to", state["color"])
+                else:
+                    print("Invalid color param:", params["color"])
+
             # proper redirect back to root
             cl.send(
                 "HTTP/1.1 303 See Other\r\n"
@@ -114,11 +164,29 @@ def serve_once(sock, state):
 
         # root page
         # build quick links from a list so it's easy to change/extend
-        words = ["hello", "happy", "sad", "bye"]
+
+        words = [
+            "HELLO",
+            "HAPPY",
+            "SAD",
+            "BYE",
+            "DAFT PUNK",
+            "ALIVE",
+            "ROBOT ROCK",
+            "HUMAN",
+            "ONE MORE TIME",
+            "TECHNOLOGIC",
+            "WORK IT",
+            "LOVE",
+            "DISCO",
+            "FUNK",
+        ]
+
         quick_links = " ".join(
             '<a class="btn" href="/set?mode=text&text={0}">{0}</a>'.format(w.upper())
             for w in words
         )
+        
 
         html = """<!doctype html>
 <html><head><meta charset="utf-8"><title>Helmet</title>
@@ -157,6 +225,11 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
 
  </p>
 </form>
+<p>
+<a class="btn" href="/set?color=100,100,100">White</a>
+<a class="btn" href="/set?color=100,0,0">Red</a>
+<a class="btn" href="/set?color=0,0,100">Blue</a>
+<a class="btn" href="/set?color=0,100,0">Green</a>
 <p>
     {quick_links}
 </p>
