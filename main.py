@@ -1,13 +1,13 @@
 # main.py — tiny glue: Wi-Fi + web + a placeholder animation loop
 import time
 import machine, neopixel
-from modes import textmode
+from modes import textmode, clock
 
 import webcontrol
 
 # Runtime state (kept here to keep things minimal)
 state = {
-    "mode": "bars",
+    "mode": "clock",
     "brightness": 0.4,
     "text": "DAFT PUNK",
 }
@@ -32,7 +32,8 @@ def demo_frame(t):
         fill_color((0, v, 0))
     elif state["mode"] == "text":
         textmode.step(np, state, t)
-        print("Text mode step at time", t)
+    elif state["mode"] == "clock":
+        clock.step(np, state, t)
     else:  # wave
         v = int(255 * b)
         fill_color((v, 0, v))

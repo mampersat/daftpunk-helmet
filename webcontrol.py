@@ -125,6 +125,8 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
   <button name="mode" value="bars">Bars</button>
   <button name="mode" value="text">Text</button>
   <button name="mode" value="wave">Wave</button>
+  <button name="mode" value="clock">Clock</button>
+  
 </p>
 <p>
   <button name="brightness" value="up">Brightness +</button>
