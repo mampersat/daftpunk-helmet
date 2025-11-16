@@ -1,7 +1,7 @@
 # main.py — tiny glue: Wi-Fi + web + a placeholder animation loop
 import time
 import machine, neopixel
-from modes import textmode, clock
+from modes import textmode, clock, tron
 
 import webcontrol
 
@@ -34,6 +34,8 @@ def demo_frame(t):
         textmode.step(np, state, t)
     elif state["mode"] == "clock":
         clock.step(np, state, t)
+    elif state["mode"] == "tron":
+        tron.step(np, state, t)
     else:  # wave
         v = int(255 * b)
         fill_color((v, 0, v))

@@ -126,15 +126,12 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
   <button name="mode" value="text">Text</button>
   <button name="mode" value="wave">Wave</button>
   <button name="mode" value="clock">Clock</button>
+  <button name="mode" value="tron">Tron</button>
   
 </p>
-<p>
-  <button name="brightness" value="up">Brightness +</button>
-  <button name="brightness" value="down">Brightness -</button>
-</p>
+
 <p>
   <input name="text" value="{text}">
-  <button type="submit">Set Text</button>
 </p>
 </form>
 </body></html>""".format(mode=state["mode"], b=state["brightness"], text=state["text"])
