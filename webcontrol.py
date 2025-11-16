@@ -97,7 +97,7 @@ def serve_once(sock, state):
                 state["mode"] = params["mode"]
                 print("Set mode to", state["mode"])
 
-            if "text" in params and params["text"]:
+            if "text" in params and params["text"] and state["mode"] == "text":
                 state["text"] = params["text"]
                 state["mode"] = "text"
                 print("Set text and mode")
@@ -113,6 +113,13 @@ def serve_once(sock, state):
             return
 
         # root page
+        # build quick links from a list so it's easy to change/extend
+        words = ["hello", "happy", "sad", "bye"]
+        quick_links = " ".join(
+            '<a class="btn" href="/set?mode=text&text={0}">{0}</a>'.format(w.upper())
+            for w in words
+        )
+
         html = """<!doctype html>
 <html><head><meta charset="utf-8"><title>Helmet</title>
 <style>
@@ -151,11 +158,10 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
  </p>
 </form>
 <p>
-    <a class="btn" href="/set?text=HELLO">Set text to HELLO</a>
-    <a class="btn" href="/set?text=HAPPY">Set text to HAPPY</a>
+    {quick_links}
 </p>
  
-</body></html>""".format(mode=state["mode"], b=state["brightness"], text=state["text"])
+</body></html>""".format(mode=state["mode"], b=state["brightness"], text=state["text"], quick_links=quick_links)
         
 
         _resp(cl, html)
