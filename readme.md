@@ -18,7 +18,10 @@
 · · · · · ● ● · · ● · ● · ● · · · · ● · · · ● · · · ● ● ● · ● · ● · ● · ● · · ·
 ```
 
-[Pico microcontroller](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html)
+# PI
+[Pi Pico 2 W microcontroller Documentation](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html#pico2w-technical-specification)
+* Pin outs
+* Diagrams
 
 # BOM
 * [Helmet purchased from MazPowerProps](https://www.etsy.com/shop/MazPowerProps?ref=yr_purchases)
