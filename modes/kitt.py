@@ -7,7 +7,7 @@ def step(np, state, t):
     # bouncing red dot with trail
     np.fill((0,0,0))
     print("KITT step at time", t)
-    pos = t % (2 * (config.COLS -1))
+    pos = (t * 10) % (2 * (config.COLS -1))
     if pos >= config.COLS:
         pos = 2*(config.COLS -1) - pos  # reverse direction on return trip
     for offset in range(-2,3):

@@ -21,6 +21,12 @@
 * [Helmet purchased from MazPowerProps](https://www.etsy.com/shop/MazPowerProps?ref=yr_purchases)
 * [Raspberry PI Pico](https://www.raspberrypi.com/products/raspberry-pi-pico/)
 
+# Modes
+* Clock
+* Discovery
+* Tron
+* Kitt
+* Grot
 
 # Inspo / Notes
 

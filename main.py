@@ -39,10 +39,10 @@ def demo_frame(t):
     mode_func(np, state, t)
 
 def main():
-    wlan = webcontrol.connect_wifi()   # ok if None
-    sock = None
-    if wlan:
-        sock = webcontrol.create_server()
+    # wlan = webcontrol.connect_wifi()   # ok if None
+    # sock = None
+    #if wlan:
+    #    sock = webcontrol.create_server()
 
     # discover the modes in the modes directory
     files = os.listdir("modes")
@@ -63,8 +63,7 @@ def main():
     t0 = time.ticks_ms()
     while True:
         # 1) serve one HTTP request (if server exists)
-        if sock:
-            webcontrol.serve_once(sock, state, available_modes=available_modes)
+        webcontrol.serve_once(state, available_modes=available_modes)
 
         # 2) draw one frame
         t = (time.ticks_diff(time.ticks_ms(), t0) / 1000.0)
@@ -74,6 +73,6 @@ def main():
         # print a . with no newline to show we're alive
         print(".", end="")
         time.sleep_ms(10)
-
+        
 if __name__ == "__main__":
     main()
