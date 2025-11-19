@@ -1,10 +1,13 @@
 # Daft Punk Helmet Lights
 
 ## It's alive
-![It's alive](itsalive.gif)
+![It's alive](images/itsalive.gif)
+
+## Onboard Webserver UI
+![Web UI](images/web_ui.png)
 
 ## First light
-![Daft Punk Helmet LED visor demo](helmet.gif)
+![Daft Punk Helmet LED visor demo](images/helmet.gif)
 
 ## Debugging output
 ```text

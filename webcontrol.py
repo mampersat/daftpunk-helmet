@@ -188,9 +188,9 @@ def _handle_root(cl, state, available_modes):
 
     words = [
         "HELLO", "HAPPY", "SAD", "BYE",
-        "DAFT PUNK", "ALIVE", "ROBOT ROCK", "HUMAN",
-        "ONE MORE TIME", "TECHNOLOGIC", "WORK IT",
-        "LOVE", "DISCO", "FUNK", "PB4UGO",
+        "DAFT PUNK", "AL1VE", "ROBOT ROCK", "HUMAN",
+        "ONE MORE TIME", "TECHNOLOGIC", "WORK 1T",
+        "LOVE", "D1SCO", "FUNK", "PB4UGO",
     ]
     quick_links = " ".join(
         '<a class="btn" href="/set?mode=text&text={0}">{0}</a>'.format(w)
@@ -236,6 +236,9 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
 </p>
 <p>
     {quick_links}
+</p>
+<p>
+    <a href="https://github.com/mampersat/daftpunk-helmet" target="_blank">GitHub repo</a>
 </p>
 </body></html>""".format(
         mode=state["mode"],
