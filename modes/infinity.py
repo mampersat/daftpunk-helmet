@@ -10,7 +10,7 @@ def step(np, state, t):
     np.fill((0,0,0))
 
     # Figure out phase (0-5)
-    phases = 6
+    phases = 8
     seconds_per_phase = 1
     phase = (int(t) // seconds_per_phase) % phases
     phase_percent = (t % seconds_per_phase) / seconds_per_phase
@@ -37,7 +37,13 @@ def step(np, state, t):
                 np[grid.xy_to_pixel(c, (config.ROWS //2) + r)] = (150,0,0)
         np.write()
 
-    if phase == 2: # solid red collapses from left/right to middle
+    if phase == 2: # solid red
+        for r in range(config.ROWS):
+            for c in range(config.COLS):
+                np[grid.xy_to_pixel(c, r)] = (150,0,0)
+        np.write()
+
+    if phase == 3: # solid red collapses from left/right to middle
         middle = config.COLS //2
         cols = middle - int((middle +2 )* phase_percent)
         print(" Phase time:", phase_time)
@@ -47,30 +53,31 @@ def step(np, state, t):
                 np[grid.xy_to_pixel(middle - c, r)] = (150,0,0)
         np.write()
 
-    if phase == 3: # solid blue lines middle to top/bottom
+    if phase == 4: # solid blue lines middle to top/bottom
         row = int(((config.ROWS // 2) +1) * phase_percent)
         print(f"{row=}" )
         for c in range(config.COLS):
                 np[grid.xy_to_pixel(c, row)] = (0,0,150)
-                if row == config.ROWS // 2:
-                    bottom = config.ROWS //2 +1
-                else:
-                    bottom = config.ROWS - row -1
-                np[grid.xy_to_pixel(c, bottom)] = (0,0,150)
+                np[grid.xy_to_pixel(c, config.ROWS - row -1)] = (0,0,150)
         np.write()
 
-    if phase == 4: # solid blue lines middle to top/bottom
+    if phase == 5: # 3 rows of blue in the middle
+        for c in range(config.COLS):
+            np[grid.xy_to_pixel(c, 1)] = (0,0,150)
+            np[grid.xy_to_pixel(c, 2)] = (0,0,150)
+            np[grid.xy_to_pixel(c, 3)] = (0,0,150)
+
+        np.write()
+
+    if phase == 6: # solid blue lines middle to top/bottom
         row = int(((config.ROWS // 2) +1) * phase_percent)
         row = config.ROWS //2 - row
         print(f"{row=}" )
         for c in range(config.COLS):
                 np[grid.xy_to_pixel(c, row)] = (0,0,150)
-                if row == config.ROWS // 2:
-                    bottom = config.ROWS //2 +1
-                else:
-                    bottom = config.ROWS - row -1
-                np[grid.xy_to_pixel(c, bottom)] = (0,0,150)
+                np[grid.xy_to_pixel(c, config.ROWS - row -1)] = (0,0,150)
+
         np.write()        
 
-    if phase == 5: # blank
+    if phase == 7: # blank
         np.write()
