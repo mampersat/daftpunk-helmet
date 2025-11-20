@@ -1,8 +1,13 @@
 # main.py
 import fivefont as ff
 import time
-import ntp
 import config
+
+PICO = True
+try:
+    import ntp
+except ImportError:
+    PICO = False
 
 def step(np, state, t):
     t = time.localtime()  # keep as struct_time, not string
@@ -10,7 +15,8 @@ def step(np, state, t):
     hour = t[3]
 
     # timezone adjust - might brake 
-    hour -= 5
+    if PICO:
+        hour -= 5
 
     hour = hour % 12
     if hour == 0:

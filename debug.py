@@ -3,7 +3,7 @@ import fivefont as ff
 import random
 import time
 import math
-from modes import grot, rain, text, tron, infinity
+from modes import grot, rain, text, tron, infinity, kitt, clock
 
 ROWS = 5
 COLS = 21
@@ -76,6 +76,7 @@ class MockNeoPixel(list):
                     seg.append(self._ansi_rgb(r, g, b) + self._dot + self._reset())
             out_lines.append(" ".join(seg))
         print("\n".join(out_lines))
+        print()
 
 N_PIX   = ROWS * COLS
 np = MockNeoPixel(0, N_PIX, width=COLS, serpentine=True)
@@ -85,13 +86,10 @@ def main_loop():
     ff.draw_text(np, COLS, ROWS, "HELLO", color=(55, 55, 55), spacing=1, serpentine=True)
     np.write()
 
-    side_burns()
-
-    # Clock
     while True:
         t = time.time()  # keep as struct_time, not string
 
-        infinity.step(np, {}, t)
+        clock.step(np, {}, t)
 
         time.sleep(0.1)
 

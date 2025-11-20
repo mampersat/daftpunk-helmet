@@ -28,11 +28,13 @@
 * [Raspberry PI Pico](https://www.raspberrypi.com/products/raspberry-pi-pico/)
 
 # Modes
-* Clock
-* Discovery
-* Tron
-* Kitt
-* Grot
+## Clock
+~[clock](videos/clock.gif)
+## Kitt
+![kitt](videos/kitt.gif)
+## Grot
+## Infinity
+![infinity](videos/infinity.gif)
 
 # Inspo / Notes
 
