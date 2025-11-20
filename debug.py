@@ -3,6 +3,7 @@ import fivefont as ff
 import random
 import time
 import math
+from modes import grot, rain, text, tron, infinity
 
 ROWS = 5
 COLS = 21
@@ -88,32 +89,12 @@ def main_loop():
 
     # Clock
     while True:
-        t = time.localtime()  # keep as struct_time, not string
+        t = time.time()  # keep as struct_time, not string
 
-        hour = t[3]
+        infinity.step(np, {}, t)
 
-        hour = hour % 12
-        if hour == 0:
-            hour = 12
-
-        if t[5] % 2 == 0:
-            s = "%d:%02d" % (hour, t[4])
-        else:
-            s = "%d.%02d" % (hour, t[4])
-
-        # Red at the top of every 0m/30m, blue at 15m/45m, green at 30m/60m
-        if (t[4] % 30) < 10:
-            color = (0, 100, 0)
-        elif (t[4] % 30) < 20:
-            color = (0, 0, 100)
-        else:
-            color = (100, 0, 0)
-
-        np.fill((0, 0, 0))        
-        side_burns()
-        ff.draw_text(np, COLS, ROWS, s, color = color, spacing=1, serpentine=True)
-        np.write()
         time.sleep(0.1)
+
 
 
 def side_burns():
