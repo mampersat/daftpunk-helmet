@@ -32,9 +32,10 @@
 ![clock](videos/clock.gif)
 ## Kitt
 ![kitt](videos/kitt.gif)
-## Grot
 ## Infinity
 ![infinity](videos/infinity.gif)
+## WOPR
+![wopr](videos/wopr.gif)
 
 # Inspo / Notes
 

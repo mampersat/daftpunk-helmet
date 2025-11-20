@@ -4,91 +4,113 @@ import grid
 
 COLORS = {
     "off":    (0, 0, 0),
-    "dimred": (25, 0, 0),
-    "red":    (80, 0, 0),
-    "orange": (255, 100, 0),
-    "yellow": (255, 200, 0),
-    "green":  (0, 200, 0),
-    "amber":  (200, 120, 0),
+    "dimred": (20, 0, 0),
+    "red":    (60, 0, 0),
+    "orange": (200, 80, 0),
+    "yellow": (200, 160, 0),
+    "green":  (0, 160, 0),
+    "amber":  (160, 80, 0),
 }
 
-# which rows act like "buses" on the board
+# which rows act like persistent "buses"
 BUS_ROWS = (1, 3)
 
-# some fixed "logic node" coordinates (x, y)
+# fixed logic nodes
 NODES = (
     (2, 0),
-    (5, 2),
-    (8, 4),
-    (12, 1),
-    (15, 3),
+    (4, 4),
+    (7, 2),
+    (10, 0),
+    (13, 3),
+    (16, 1),
 )
 
-
 def step(np, state, t):
-    """
-    WOPR / circuit-board style:
-    - dim red background
-    - horizontal buses on a couple rows
-    - bright pulses flowing along buses
-    - blinking logic nodes
-    """
     cols = config.COLS
     rows = config.ROWS
 
-    # phase values drive everything; tweak speeds here
-    phase_fast  = int(t * 18)   # quick pulses
-    phase_slow  = int(t * 5)    # node blinking
-    phase_med   = int(t * 9)    # scan / shimmer
+    # Slower global motion
+    slow = int(t * 2)
+    med  = int(t * 4)
+    fast = int(t * 7)
 
-    # 1) base background: dim red everywhere
+    # Split the visor into 3 vertical zones
+    zone_width = cols // 3
+
+    # --- 1) Base background (mix of red + black) ---
     for x in range(cols):
         for y in range(rows):
-            np[grid.xy_to_pixel(x, y)] = COLORS["dimred"]
+            idx = grid.xy_to_pixel(x, y)
 
-    # 2) horizontal buses with moving pulses
+            # Every other row darker → more "PCB shadow"
+            if (y % 2 == 0) and ((x + slow) % 4 == 0):
+                np[idx] = COLORS["off"]
+            else:
+                np[idx] = COLORS["dimred"]
+
+    # --- 2) Horizontal bus traces with slow data pulses ---
     for y in BUS_ROWS:
         for x in range(cols):
             idx = grid.xy_to_pixel(x, y)
 
-            # base bus line slightly brighter than background
+            # base bus line
             np[idx] = COLORS["red"]
 
-            # moving "data packets" along the bus
-            # these are bright yellow / orange streaks
-            # pattern repeats every 6 pixels, offset by time
-            k = (x - phase_fast) % 6
+            # data pulses, slower & chunkier than before
+            # different zones move at different speeds
+            if x < zone_width:
+                phase = slow
+            elif x < zone_width * 2:
+                phase = med
+            else:
+                phase = fast
+
+            k = (x - phase) % 8
             if k == 0:
                 np[idx] = COLORS["yellow"]
-            elif k == 1:
+            elif k in (1, 2):
                 np[idx] = COLORS["orange"]
 
-            # extra shimmer: occasional amber pixel
-            if ((x * 7 + y * 11 + phase_med) % 23) == 0:
+            # occasional amber sparkle on buses
+            if ((x * 9 + y * 3 + slow) % 31) == 0:
                 np[idx] = COLORS["amber"]
 
-    # 3) subtle vertical scan, like activity in columns
+    # --- 3) Vertical activity columns (different frequencies) ---
     for x in range(cols):
-        # every few columns, make one pixel in the column flicker brighter
-        if ((x + phase_med) % 4) == 0:
-            # choose a row that moves up/down slowly
-            y = (phase_slow + x) % rows
+        # zone-based blinking speeds
+        if x < zone_width:
+            blink_phase = slow
+            rate = 6
+        elif x < zone_width * 2:
+            blink_phase = med
+            rate = 5
+        else:
+            blink_phase = fast
+            rate = 4
+
+        if (x + blink_phase) % rate == 0:
+            y = (slow + x) % rows
             idx = grid.xy_to_pixel(x, y)
-            # only boost if it's not already a bus highlight
+
+            # don't overwrite bright pulses
             r, g, b = np[idx]
-            if r < 200 and g < 200 and b < 200:
+            if r < 150 and g < 150 and b < 150:
                 np[idx] = COLORS["orange"]
 
-    # 4) logic nodes that blink independently
-    for (nx, ny) in NODES:
+    # --- 4) Logic nodes with independent blink speeds ---
+    for i, (nx, ny) in enumerate(NODES):
         if 0 <= nx < cols and 0 <= ny < rows:
             idx = grid.xy_to_pixel(nx, ny)
-            # nodes blink with a slower pseudo-random pattern
-            v = (nx * 13 + ny * 31 + phase_slow) % 16
-            if v < 4:
+
+            # each node blinks at its own rate
+            node_phase = int(t * (2 + i * 0.8))
+            v = (node_phase + nx + ny * 5) % 10
+
+            if v < 2:
                 np[idx] = COLORS["green"]
-            elif v < 8:
+            elif v < 4:
                 np[idx] = COLORS["amber"]
-            # else: leave whatever the bus/background set
+            elif v == 7:
+                np[idx] = COLORS["off"]  # real "dead" blink
 
     np.write()

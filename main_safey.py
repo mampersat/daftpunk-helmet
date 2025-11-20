@@ -4,6 +4,7 @@ import machine
 import neopixel
 import os
 
+from modes import clock, grot, rain, text, tron
 import webcontrol
 
 # Runtime state (kept here to keep things minimal)
