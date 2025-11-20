@@ -14,7 +14,6 @@ def step(np, state, t):
     seconds_per_phase = 1
     phase = (int(t) // seconds_per_phase) % phases
     phase_percent = (t % seconds_per_phase) / seconds_per_phase
-    phase_time = phase_percent * seconds_per_phase
     print(f"{phase=}, {phase_percent=}")
 
     # phase = 4
@@ -30,7 +29,6 @@ def step(np, state, t):
     
     if phase == 1: # solid red lins start in middle and fill out
         row = int(((config.ROWS // 2) +1) * phase_percent) +1
-        print(" Phase time:", phase_time)
         for c in range(config.COLS):
             for r in range(row):
                 np[grid.xy_to_pixel(c, (config.ROWS //2) - r)] = (150,0,0)
@@ -46,7 +44,6 @@ def step(np, state, t):
     if phase == 3: # solid red collapses from left/right to middle
         middle = config.COLS //2
         cols = middle - int((middle +2 )* phase_percent)
-        print(" Phase time:", phase_time)
         for r in range(config.ROWS):
             for c in range(cols):
                 np[grid.xy_to_pixel(middle + c, r)] = (150,0,0)
