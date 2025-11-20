@@ -3,7 +3,7 @@ import fivefont as ff
 import random
 import time
 import math
-from modes import grot, rain, text, tron, infinity, kitt, clock
+from modes import grot, rain, text, tron, infinity, kitt, clock, wopr
 
 ROWS = 5
 COLS = 21
@@ -89,7 +89,7 @@ def main_loop():
     while True:
         t = time.time()  # keep as struct_time, not string
 
-        clock.step(np, {}, t)
+        wopr.step(np, {}, t)
 
         time.sleep(0.1)
 
