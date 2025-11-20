@@ -29,7 +29,7 @@
 
 # Modes
 ## Clock
-~[clock](videos/clock.gif)
+![clock](videos/clock.gif)
 ## Kitt
 ![kitt](videos/kitt.gif)
 ## Grot
