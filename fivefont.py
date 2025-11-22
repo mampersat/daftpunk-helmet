@@ -127,24 +127,56 @@ def draw_text_window(np, width, height, text, window_x, color=(255,255,255), spa
         x += draw_char(np, width, height, x, ch, color=color, spacing=spacing, serpentine=serpentine)
     return tw
 
-def scroll_text(np, width, height, text, color=(255,255,255), spacing=1, speed_cols=1, delay_ms=40, serpentine=True, write_fn=None, sleep_fn=None):
+def scroll_text(np, width, height, text,
+                color=(255, 255, 255),
+                spacing=1,
+                speed_cols=1,
+                delay_ms=40,
+                serpentine=True,
+                write_fn=None,
+                sleep_fn=None):
     """
-    Simple blocking marquee: scrolls left across the display.
+    Simple blocking marquee: scrolls text from off-screen right to off-screen left.
+    - Starts with an empty window (text fully off to the right),
+      scrolls in, then fully off to the left.
     - write_fn: function to flush (defaults to np.write if present, else no-op).
     - sleep_fn: function to sleep milliseconds (MicroPython: time.sleep_ms).
     """
+    import time
+
+    # total text width in columns
     tw = 0
     for ch in text:
         tw += len(FONT_3x5.get(ch.upper(), ())) + spacing
+
     window = width  # visible window width
-    total_steps = max(0, tw + window)
+
+    # We want the text to start completely off-screen to the right and
+    # exit completely off-screen to the left.
+    # So let the window "x" offset run from -window (all blank)
+    # to +tw (text has fully exited on the left).
+    start = -window
+    end = tw
 
     # Resolve write/sleep
     if write_fn is None:
         write_fn = getattr(np, "write", lambda: None)
+    if sleep_fn is None:
+        # desktop vs micropython-friendly
+        sleep_fn = lambda ms: time.sleep(ms / 1000.0)
 
-    for step in range(0, total_steps, max(1, speed_cols)):
-        draw_text_window(np, width, height, text, window_x=step, color=color, spacing=spacing, serpentine=serpentine)
+    for window_x in range(start, end + 1, max(1, speed_cols)):
+        draw_text_window(
+            np,
+            width,
+            height,
+            text,
+            window_x=window_x,
+            color=color,
+            spacing=spacing,
+            serpentine=serpentine,
+        )
         write_fn()
-        time.sleep(delay_ms / 1000.0)
+        sleep_fn(delay_ms)
+
 

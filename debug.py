@@ -2,7 +2,7 @@
 import fivefont as ff
 
 import time
-from modes import grot, rain, text, tron, infinity, kitt, clock, wopr, hal, eqbars
+from modes import grot, rain, text, tron, infinity, kitt, clock, wopr, hal, eqbars, scroll
 
 ROWS = 5
 COLS = 21
@@ -85,10 +85,15 @@ def main_loop():
     ff.draw_text(np, COLS, ROWS, "HELLO", color=(55, 55, 55), spacing=1, serpentine=True)
     np.write()
 
+    state = {
+        "text": "DAFT PUNK HELMET DEMO ",
+        "color": (0, 100, 100),
+    }
+
     while True:
         t = time.time()  # keep as struct_time, not string
 
-        eqbars.step(np, {}, t)
+        scroll.step(np, state, t)
 
         time.sleep(0.1)
 # Map pixel number to x,y

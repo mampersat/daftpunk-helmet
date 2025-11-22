@@ -186,16 +186,30 @@ def _handle_root(cl, state, available_modes):
         for m in available_modes
     )
 
-    words = [
+    short_words = [
         "HELLO", "HAPPY", "SAD", "BYE",
-        "DAFT PUNK", "AL1VE", "ROBOT ROCK", "HUMAN",
-        "ONE MORE TIME", "TECHNOLOGIC", "WORK 1T",
-        "LOVE", "D1SCO", "FUNK", "PB4UGO",
+        "AL1VE", "HUMAN",
+        "WORK 1T",
+        "LOVE", "D1SCO", "FUNK"
     ]
     quick_links = " ".join(
         '<a class="btn" href="/set?mode=text&text={0}">{0}</a>'.format(w)
-        for w in words
+        for w in short_words
     )
+
+    scroll_words = [
+        "DAFT PUNK",
+        "ROBOT ROCK",
+        "OEN MORE TIME",
+        "TECHNOLOGIC",
+        "P B 4 U GO",
+    ]
+
+    scroll_links = " ".join(
+        '<a class="btn" href="/set?mode=scroll&text={0}">{0}</a>'.format(w)
+        for w in scroll_words
+    )
+
 
     html = """<!doctype html>
 <html><head><meta charset="utf-8"><title>Helmet</title>
@@ -218,7 +232,7 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
 </style></head>
 <body>
 <h1>Daft Punk Helmet</h1>
-<p>Mode: <b>{mode}</b> — Brightness: {b:.2f}</p>
+<h2>Mode: <b>{mode}</h2>
 <form action="/set" method="get">
 <p>
     {mode_buttons}
@@ -234,9 +248,13 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
 <a class="btn" href="/set?color=0,0,100">Blue</a>
 <a class="btn" href="/set?color=0,100,0">Green</a>
 </p>
-<p>
+<p> 
+    Quick text presets:
     {quick_links}
 </p>
+<p>
+    Scroll presets:
+    {scroll_links}
 <p>
     <a href="https://github.com/mampersat/daftpunk-helmet" target="_blank">GitHub repo</a>
 </p>
@@ -245,6 +263,7 @@ input[type=text] {{width:80%%;font-size:1rem;padding:.3rem}}
         b=state["brightness"],
         text=state["text"],
         quick_links=quick_links,
+        scroll_links=scroll_links,
         mode_buttons=mode_buttons,
     )
 
