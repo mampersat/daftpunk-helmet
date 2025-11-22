@@ -1,9 +1,8 @@
 # main.py
 import fivefont as ff
-import random
+
 import time
-import math
-from modes import grot, rain, text, tron, infinity, kitt, clock, wopr, hal
+from modes import grot, rain, text, tron, infinity, kitt, clock, wopr, hal, snakes, fire, eqbars
 
 ROWS = 5
 COLS = 21
@@ -89,22 +88,9 @@ def main_loop():
     while True:
         t = time.time()  # keep as struct_time, not string
 
-        hal.step(np, {}, t)
+        eqbars.step(np, {}, t)
 
         time.sleep(0.1)
-
-
-
-def side_burns():
-    # side burns
-    for x in [0, 1, 2, COLS - 3, COLS - 2, COLS - 1]:
-        np[xy_to_pixel(x, 0)] = (20, 0, 0)
-        np[xy_to_pixel(x, 1)] = (10, 10, 0)
-        np[xy_to_pixel(x, 2)] = (0, 20, 0)
-        np[xy_to_pixel(x, 3)] = (0, 0, 20)
-        np[xy_to_pixel(x, 4)] = (0, 0, 20)
-        # np.write()
-
 # Map pixel number to x,y
 # The pixels are in a serpintine layout with COLS columns and ROWS rows
 def pixel_to_xy(p):

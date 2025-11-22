@@ -5,6 +5,7 @@ import neopixel
 import os
 
 import webcontrol
+# import badapple_frames # throws memoery error :(
 
 # Runtime state (kept here to keep things minimal)
 state = {

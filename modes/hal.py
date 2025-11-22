@@ -1,22 +1,23 @@
-# modes/hal.py – HAL 9000 eye pulse
+# modes/hal.py – HAL 9000 eye pulse (scaled for wide, short display)
 import math
 import grid
 import config
 
-# HAL palette
+# HAL-ish colors
 BLACK = (0, 0, 0)
-DARK_RED = (20, 0, 0)
-MID_RED  = (80, 0, 0)
-HAL_RED  = (255, 40, 20)
+DIM_RED = (10, 0, 0)
+MID_RED = (60, 0, 0)
+HAL_RED = (255, 40, 20)
 HAL_CORE = (255, 120, 80)
 
 
 def step(np, state, t):
     """
     HAL 9000 Eye Pulse:
-    - Smooth breathing red glow
-    - Brighter center "lens"
-    - Occasional tiny flicker glitches
+    - Designed for wide, short matrices (e.g. 21x5)
+    - Small bright core in the center
+    - One-pixel 'ring' around it
+    - Slow breathing pulse
     """
 
     cols = config.COLS
@@ -25,17 +26,19 @@ def step(np, state, t):
     cx = (cols - 1) / 2
     cy = (rows - 1) / 2
 
-    # --- Pulse: smooth sinusoidal breathing ---
-    # slows down nicely: try adjusting 0.6 for speed
-    pulse = (math.sin(t * 0.6) + 1) / 2
+    # Slow pulse: tweak 0.5 for speed
+    pulse = (math.sin(t * 0.5) + 1) / 2  # 0..1
+    # Use a non-linear curve to make it linger dimmer/bright longer
+    pulse_pow = pulse * pulse
 
-    # map pulse to brightness curve (non-linear, cinematic)
-    base_intensity = int(30 + pulse * 100)
-    core_intensity = int(80 + pulse * 150)
+    # Base intensities (keep fairly low so core pops)
+    base_r = int(15 + 40 * pulse_pow)   # background glow
+    ring_r = int(40 + 120 * pulse_pow)  # ring level
+    core_r = int(80 + 175 * pulse_pow)  # bright core
 
-    # small random flicker every ~7 seconds
+    # Occasional tiny “thinking” flicker on the core only
     flicker = False
-    if int(t * 10) % 70 == 0:
+    if int(t * 8) % 37 == 0:
         flicker = True
 
     for x in range(cols):
@@ -43,31 +46,45 @@ def step(np, state, t):
             dx = abs(x - cx)
             dy = abs(y - cy)
 
-            # distance from center
-            dist = math.sqrt(dx*dx + dy*dy)
+            # For a 5-row display, don't bother with big circles:
+            # define simple "bands" around the center.
+            #
+            # core region: very small, center-ish
+            # ring region: slightly larger rectangle around it
 
-            # lens falloff (soft radial gradient)
-            falloff = max(0, 1.0 - dist / (cols / 2))
+            # measure “radius” with horizontal stretched (wide eye)
+            # and vertical compressed
+            nx = dx / max(1.0, (cols / 6))   # horizontal radius
+            ny = dy / max(1.0, (rows / 2))   # vertical radius
+            r = math.sqrt(nx * nx + ny * ny)
 
-            if falloff <= 0:
-                color = BLACK
+            if r < 0.5:
+                # Core pixels: tiny center
+                r_val = core_r
+                g_val = int(core_r * 0.35)
+                b_val = int(core_r * 0.2)
+
+                if flicker:
+                    r_val = min(255, r_val + 40)
+
+                color = (r_val, g_val, b_val)
+
+            elif r < 1.1:
+                # Tight ring around core
+                r_val = ring_r
+                color = (r_val, 0, 0)
+
+            elif r < 1.8:
+                # Outer glow band (subtle)
+                r_val = base_r
+                color = (r_val, 0, 0)
+
             else:
-                # base glow
-                r = int(base_intensity * falloff)
-                g = 0
-                b = 0
-
-                # brighter center core
-                if dist < 1.5:
-                    r = int(core_intensity)
-                    g = int(core_intensity * 0.3)
-                    b = int(core_intensity * 0.15)
-
-                # subtle flicker glitch
-                if flicker and dist < 2.5:
-                    r = min(255, r + 60)
-
-                color = (r, g, b)
+                # Outside eye: mostly dark with a hint of dim red
+                if (x + y) % 3 == 0:
+                    color = DIM_RED
+                else:
+                    color = BLACK
 
             np[grid.xy_to_pixel(x, y)] = color
 

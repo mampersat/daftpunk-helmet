@@ -26,6 +26,7 @@
 # BOM
 * [Helmet purchased from MazPowerProps](https://www.etsy.com/shop/MazPowerProps?ref=yr_purchases)
 * [Raspberry PI Pico](https://www.raspberrypi.com/products/raspberry-pi-pico/)
+* [Neo Pixels](https://www.adafruit.com/product/2541?gad_source=1&gad_campaignid=21079227318&gclid=CjwKCAiAlfvIBhA6EiwAcErpybIXyZYECiYq-Q7L3u5l67m0Edsdn_NDSeSnuiATtLG76Yl7Dwm_1xoC0fAQAvD_BwE)
 
 # Modes
 ## Clock
