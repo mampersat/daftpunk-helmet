@@ -2,7 +2,7 @@
 import fivefont as ff
 
 import time
-from modes import grot, rain, text, tron, infinity, kitt, clock, wopr, hal, snakes, fire, eqbars
+from modes import grot, rain, text, tron, infinity, kitt, clock, wopr, hal, eqbars
 
 ROWS = 5
 COLS = 21
