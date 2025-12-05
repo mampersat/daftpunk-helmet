@@ -93,7 +93,7 @@ def main_loop():
     while True:
         t = time.time()  # keep as struct_time, not string
 
-        scroll.step(np, state, t)
+        eqbars.step(np, state, t)
 
         time.sleep(0.1)
 # Map pixel number to x,y

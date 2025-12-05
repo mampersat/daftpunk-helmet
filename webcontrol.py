@@ -181,10 +181,7 @@ def _handle_set(cl, state, params):
 def _handle_root(cl, state, available_modes):
     if available_modes is None:
         available_modes = []
-    mode_buttons = " ".join(
-        '<a class="btn" href="/set?mode={0}">{0}</a>'.format(m)
-        for m in available_modes
-    )
+    mode_buttons = " ".join('<a class="btn" href="/set?mode={0}">{0}</a>'.format(m) for m in available_modes)
 
     short_words = [
         "HELLO", "HAPPY", "SAD", "BYE",
@@ -200,9 +197,10 @@ def _handle_root(cl, state, available_modes):
     scroll_words = [
         "DAFT PUNK",
         "ROBOT ROCK",
-        "OEN MORE TIME",
+        "ONE MORE TIME",
         "TECHNOLOGIC",
         "P B 4 U GO",
+        "let----it----be"
     ]
 
     scroll_links = " ".join(
