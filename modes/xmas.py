@@ -1,13 +1,13 @@
-# modes/xmas.py – tiny Xmas scene for 21x5 visor
-#
-# - Green tree centered on bottom rows
-# - Brown trunk
-# - Twinkling colored lights
-# - Falling snowflakes
+# modes/xmas.py – lightweight, robust falling snow for 21x5 visor
 #
 # Assumes:
 #   import config  (COLS, ROWS)
 #   import grid    (xy_to_pixel)
+#
+# Effect:
+#   - Dark night background
+#   - White/blue snowflakes drifting down
+#   - Simple integer "twinkle"
 
 import config
 import grid
@@ -20,76 +20,19 @@ except ImportError:
 COLS = config.COLS
 ROWS = config.ROWS
 
-# Colors
-BG       = (0, 0, 8)       # dark “night sky”
-TREE     = (0, 120, 0)
-TRUNK    = (80, 40, 0)
-SNOW     = (200, 200, 255)
-STAR     = (255, 255, 80)
-LIGHT_COLORS = [
-    (255, 40, 40),   # red
-    (255, 160, 40),  # orange
-    (255, 255, 80),  # yellow
-    (80, 255, 80),   # green
-    (80, 160, 255),  # blue
-    (200, 80, 255),  # purple
-]
+BG         = (0, 0, 8)          # night sky
+SNOW_BASE  = (210, 210, 255)    # base snow color
 
-# Module-level animation state
+# Global animation state
 _frame = 0
-_snowflakes = []   # list of (x, y)
+_snowflakes = []   # list of (x, y, phase)
 
+# --- Tuning knobs (you can change these) ---
 
-# Precompute tree geometry for 21x5-ish layout
-def _build_tree():
-    """
-    Return (tree_pixels, trunk_pixels, light_pixels, star_pixel) as lists of (x,y).
-    Designed for 21x5, but uses COLS/ROWS so it adapts a bit.
-    """
-    cx = COLS // 2
-    bottom = ROWS - 1
-
-    tree_pixels = []
-    trunk_pixels = []
-    light_pixels = []
-
-    # Simple 3-layer tree (bottom wide, top narrow)
-    # from bottom-1 up to top-ish
-    layers = [
-        (bottom - 1, 4),  # y, half-width (so width = 2*w+1)
-        (bottom - 2, 3),
-        (bottom - 3, 2),
-    ]
-    for y, halfw in layers:
-        if 0 <= y < ROWS:
-            for dx in range(-halfw, halfw + 1):
-                x = cx + dx
-                if 0 <= x < COLS:
-                    tree_pixels.append((x, y))
-
-    # Trunk: 1 or 2 pixels wide centered
-    trunk_y = bottom
-    for dx in (-1, 0):
-        x = cx + dx
-        if 0 <= x < COLS and 0 <= trunk_y < ROWS:
-            trunk_pixels.append((x, trunk_y))
-
-    # Lights: choose a subset of tree pixels to host bulbs
-    # (e.g. every Nth pixel)
-    for i, (x, y) in enumerate(tree_pixels):
-        if i % 3 == 0:  # tweak density by changing 3
-            light_pixels.append((x, y))
-
-    # Star at the top (one pixel above highest tree layer if possible)
-    star_y = layers[-1][0] - 1
-    star_pixel = None
-    if 0 <= star_y < ROWS:
-        star_pixel = (cx, star_y)
-
-    return tree_pixels, trunk_pixels, light_pixels, star_pixel
-
-
-_TREE_PIXELS, _TRUNK_PIXELS, _LIGHT_PIXELS, _STAR_PIXEL = _build_tree()
+FALL_EVERY = 5      # frames between downward moves (1 = fastest, 2 = nice fast, 3+ slower)
+SPAWN_CHANCE_NUM = 1
+SPAWN_CHANCE_DEN = 5  # spawn probability ≈ NUM/DEN
+MAX_FLAKES = 10     # ABSOLUTE cap on flakes
 
 
 def _randint(a, b):
@@ -97,75 +40,98 @@ def _randint(a, b):
     return a + (_random.getrandbits(16) % (b - a + 1))
 
 
-def _chance(p_num, p_den):
-    """Return True with probability p_num/p_den."""
-    return (_random.getrandbits(16) % p_den) < p_num
+def _chance(num, den):
+    return (_random.getrandbits(16) % den) < num
 
 
-def _update_snow():
-    """Update global _snowflakes list in-place."""
+def _spawn_snowflakes():
     global _snowflakes
 
-    new_snow = []
+    if len(_snowflakes) >= MAX_FLAKES:
+        return
 
-    # Move existing flakes down
-    for (x, y) in _snowflakes:
-        # every frame they fall 1 row
-        ny = y + 1
-        if ny < ROWS:
-            new_snow.append((x, ny))
-        # else: dropped off bottom
-
-    # Maybe spawn new flakes at top
-    # Chance per frame to spawn a few flakes
-    for _ in range(COLS // 4 + 1):
-        if _chance(1, 4):  # 25% chance to spawn
+    # a few "slots" across the width
+    slots = COLS // 3 + 1
+    for _ in range(slots):
+        if len(_snowflakes) >= MAX_FLAKES:
+            break
+        if _chance(SPAWN_CHANCE_NUM, SPAWN_CHANCE_DEN):
             x = _randint(0, COLS - 1)
-            new_snow.append((x, 0))
+            # (x, y, phase)
+            _snowflakes.append((x, 0, _randint(0, 255)))
 
-    _snowflakes = new_snow
+
+def _update_snowflakes():
+    global _snowflakes, _frame
+
+    move_now = (FALL_EVERY <= 1) or (_frame % FALL_EVERY == 0)
+
+    new_list = []
+    for (x, y, phase) in _snowflakes:
+        if move_now:
+            # tiny horizontal drift
+            if _chance(1, 5):
+                x += _randint(-1, 1)
+                if x < 0:
+                    x = 0
+                elif x >= COLS:
+                    x = COLS - 1
+            y += 1
+
+        if y < ROWS:
+            # advance phase for twinkle (integer wrap)
+            phase = (phase + 7) & 0xFF
+            new_list.append((x, y, phase))
+
+    # enforce hard cap
+    if len(new_list) > MAX_FLAKES:
+        new_list = new_list[-MAX_FLAKES:]
+
+    _snowflakes = new_list
+
+    # maybe spawn new flakes at top
+    _spawn_snowflakes()
+
+
+def _flake_color(phase):
+    """
+    Integer-only twinkle:
+    - phase 0..255 -> local brightness 0..127 -> map to [60..100]%
+    """
+    v = phase & 0x7F   # 0..127
+    if phase & 0x80:
+        v = 127 - v    # triangle wave
+
+    # brightness in 60..100% as integer 60..100
+    #  v/127 ≈ 0..1 -> scale to 0..40 and add 60
+    bright_pct = 60 + (40 * v) // 127  # 60..100
+
+    r = (SNOW_BASE[0] * bright_pct) // 100
+    g = (SNOW_BASE[1] * bright_pct) // 100
+    b = (SNOW_BASE[2] * bright_pct) // 100
+
+    # clamp, just in case
+    if r > 255: r = 255
+    if g > 255: g = 255
+    if b > 255: b = 255
+
+    return (r, g, b)
 
 
 def step(np, state, t):
     global _frame
-
     _frame += 1
 
-    # 1) Update snow positions
-    _update_snow()
+    _update_snowflakes()
 
-    # 2) Clear background
+    # background
     for x in range(COLS):
         for y in range(ROWS):
             np[grid.xy_to_pixel(x, y)] = BG
 
-    # 3) Draw tree + trunk
-    for (x, y) in _TREE_PIXELS:
-        np[grid.xy_to_pixel(x, y)] = TREE
-
-    for (x, y) in _TRUNK_PIXELS:
-        np[grid.xy_to_pixel(x, y)] = TRUNK
-
-    # 4) Star on top (twinkle a bit)
-    if _STAR_PIXEL is not None:
-        sx, sy = _STAR_PIXEL
-        # Simple pulsing brightness based on frame
-        fade = ((_frame // 4) % 4)  # 0..3
-        base = 180 + fade * 20
-        if base > 255:
-            base = 255
-        color = (base, base, 80)
-        np[grid.xy_to_pixel(sx, sy)] = color
-
-    # 5) Xmas lights – twinkle through LIGHT_COLORS
-    for i, (x, y) in enumerate(_LIGHT_PIXELS):
-        # Each light cycles through colors at its own pace
-        phase = (_frame // 5 + i) % len(LIGHT_COLORS)
-        col = LIGHT_COLORS[phase]
-        np[grid.xy_to_pixel(x, y)] = col
-
-    # 6) Snow drawn last so it sits "on top" of tree/lights
-    for (x, y) in _snowflakes:
-        np[grid.xy_to_pixel(x, y)] = SNOW
+    # draw flakes
+    for (x, y, phase) in _snowflakes:
+        color = _flake_color(phase)
+        np[grid.xy_to_pixel(x, y)] = color
 
     np.write()
