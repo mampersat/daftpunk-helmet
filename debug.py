@@ -93,7 +93,7 @@ def main_loop():
     while True:
         t = time.time()  # keep as struct_time, not string
 
-        snow.step(np, state, t)
+        wopr.step(np, state, t)
 
         time.sleep(0.1)
 # Map pixel number to x,y
